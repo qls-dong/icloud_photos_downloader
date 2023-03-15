@@ -2,7 +2,7 @@
 
 import sys
 import click
-import pyicloud_ipd
+import pyicloud
 from icloudpd.logger import setup_logger
 
 
@@ -20,6 +20,7 @@ def authenticator(domain):
             cookie_directory=None,
             raise_error_on_2sa=False,
             client_id=None,
+            china_mainland=False,
     ):
         """Authenticate with iCloud username and password"""
         logger = setup_logger()
@@ -28,27 +29,53 @@ def authenticator(domain):
             try:
                 # If password not provided on command line variable will be set to None
                 # and PyiCloud will attempt to retrieve from its keyring
-                icloud = pyicloud_ipd.PyiCloudService(
+                icloud = pyicloud.PyiCloudService(
                     domain,
                     username, password,
                     cookie_directory=cookie_directory,
                     client_id=client_id,
+                    china_mainland=china_mainland,
                     )
                 break
-            except pyicloud_ipd.exceptions.NoStoredPasswordAvailable:
+            except pyicloud.exceptions.PyiCloudNoStoredPasswordAvailableException:
                 # Prompt for password if not stored in PyiCloud's keyring
                 password = click.prompt("iCloud Password", hide_input=True)
+                icloud = pyicloud.PyiCloudService(
+                    username, password,
+                    cookie_directory=cookie_directory,
+                    client_id=client_id,
+                    china_mainland=china_mainland)
 
-        if icloud.requires_2sa:
+        if icloud.requires_2fa:
+            if raise_error_on_2sa:
+                raise TwoStepAuthRequiredError(
+                    "Two-factor authentication is required!"
+                )
+            logger.info("Two-factor authentication is required!")
+            request_2fa(icloud, logger)
+        elif icloud.requires_2sa:
             if raise_error_on_2sa:
                 raise TwoStepAuthRequiredError(
                     "Two-step/two-factor authentication is required!"
                 )
-            logger.info("Two-step/two-factor authentication is required!")
+            logger.info("Two-step authentication is required!")
             request_2sa(icloud, logger)
         return icloud
     return authenticate_
 
+def request_2fa(icloud, logger):
+    """Request two-factor authentication."""
+    code = click.prompt("Please enter two-factor authentication code")
+    if not icloud.validate_2fa_code(code):
+        logger.error("Failed to verify two-factor authentication code")
+        sys.exit(1)
+    logger.info(
+        "Great, you're all set up. The script can now be run without "
+        "user interaction until 2FA expires.\n"
+        "You can set up email notifications for when "
+        "the two-factor authentication expires.\n"
+        "(Use --help to view information about SMTP options.)"
+    )
 
 def request_2sa(icloud, logger):
     """Request two-step authentication. Prompts for SMS or device"""
