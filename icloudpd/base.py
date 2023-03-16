@@ -52,8 +52,8 @@ CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
     metavar="<password>",
 )
 @click.option("--china-mainland",
-              help="The country/region setting of your Apple ID is China mainland(中国大陆)",
-              is_flag=True,
+    help="The country/region setting of your Apple ID is China mainland(中国大陆)",
+    is_flag=True,
 )
 @click.option(
     "--cookie-directory",
