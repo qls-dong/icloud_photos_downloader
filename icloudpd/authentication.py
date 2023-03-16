@@ -30,7 +30,6 @@ def authenticator(domain):
                 # If password not provided on command line variable will be set to None
                 # and PyiCloud will attempt to retrieve from its keyring
                 icloud = pyicloud.PyiCloudService(
-                    domain,
                     username, password,
                     cookie_directory=cookie_directory,
                     client_id=client_id,
