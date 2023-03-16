@@ -194,10 +194,10 @@ CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
     default="debug",
 )
 @click.option("--no-progress-bar",
-              help="Disables the one-line progress bar and prints log messages on separate lines "
-              "(Progress bar is disabled by default if there is no tty attached)",
-              is_flag=True,
-              )
+    help="Disables the one-line progress bar and prints log messages on separate lines "
+    "(Progress bar is disabled by default if there is no tty attached)",
+    is_flag=True,
+)
 @click.option(
     "--threads-num",
     help="Number of cpu threads -- deprecated. To be removed in future version",
@@ -229,6 +229,7 @@ def main(
         directory,
         username,
         password,
+        china_mainland,
         cookie_directory,
         size,
         live_photo_size,
@@ -304,6 +305,7 @@ def main(
             directory,
             username,
             password,
+            china_mainland,
             cookie_directory,
             size,
             recent,
@@ -540,6 +542,7 @@ def core(
         directory,
         username,
         password,
+        china_mainland,
         cookie_directory,
         size,
         recent,
@@ -578,6 +581,7 @@ def core(
             cookie_directory,
             raise_error_on_2sa,
             client_id=os.environ.get("CLIENT_ID"),
+            china_mainland=china_mainland,
         )
     except TwoStepAuthRequiredError:
         if notification_script is not None:
