@@ -20,7 +20,7 @@ def authenticator(domain):
             cookie_directory=None,
             raise_error_on_2sa=False,
             client_id=None,
-            china_mainland=False,
+            china_mainland=True,
     ):
         """Authenticate with iCloud username and password"""
         logger = setup_logger()
